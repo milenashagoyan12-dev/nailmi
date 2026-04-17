@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NailMi – Nail Artist</title>
+  <link rel="stylesheet" href="css2.css">
+
+  <style>
+    /* ─── VARIABLES ──────────────────────────────────────────────── */
+    :root {
+      --rose-pale:    #fce8ee;
+      --rose-doux:    #f4b8cc;
+      --rose-vif:     #e07a99;
+      --rose-fonce:   #c45a7a;
+      --mauve:        #c9a0bc;
+      --mauve-clair:  #f0e0f0;
+      --blanc:        #fffbfc;
+      --texte:        #4a2035;
+      --texte-doux:   #7a4a60;
+      --or:           #e8c89a;
+
+      --font-titre:   'Cormorant Garamond', serif;
+      --font-corps:   'Jost', sans-serif;
+    }
+
+    /* ─── RESET & BASE ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--blanc);
+      color: var(--texte);
+      font-family: var(--font-corps);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── PÉTALES DÉCORATIFS ─────────────────────────────────────── */
+    .petal {
+      position: fixed;
+      width: 12px; height: 18px;
+      border-radius: 50% 0 50% 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ─── NAVIGATION ─────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 6%;
+      background: rgba(255,251,252,0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--rose-doux);
+    }
+    .nav-logo {
+      font-family: var(--font-titre);
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--rose-fonce);
+      letter-spacing: 0.03em;
+    }
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--texte-doux);
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--rose-vif); }
+    .nav-cta {
+      background: var(--rose-vif);
+      color: #fff !important;
+      padding: 9px 22px;
+      border-radius: 30px;
+      font-size: 0.75rem !important;
+      letter-spacing: 0.12em;
+      transition: background 0.3s !important;
+    }
+    .nav-cta:hover { background: var(--rose-fonce) !important; color: #fff !important; }
+
+    /* ─── HERO ───────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 6% 80px;
+      position: relative;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 30%, #fce8ee 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 20% 70%, #f0e0f0 0%, transparent 60%),
+        var(--blanc);
+    }
+    .hero-logo {
+      width: 200px;
+      border-radius: 50%;
+      box-shadow: 0 8px 40px rgba(224,122,153,0.25);
+      margin-bottom: 2rem;
+      animation: floatLogo 4s ease-in-out infinite;
+    }
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    .hero-titre {
+      font-family: var(--font-titre);
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--texte);
+      margin-bottom: 0.4rem;
+    }
+    .hero-titre span { color: var(--rose-vif); font-style: italic; }
+    .hero-sous {
+      font-size: 0.82rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--mauve);
+      margin-bottom: 1.8rem;
+    }
+    .hero-desc {
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      font-size: 1rem;
+      color: var(--texte-doux);
+    }
+    .btn-principal {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--rose-vif), var(--rose-fonce));
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 38px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      box-shadow: 0 6px 24px rgba(196,90,122,0.35);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-principal:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(196,90,122,0.45);
+    }
+    .hero-badges {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+      margin-top: 2.5rem;
+    }
+    .badge {
+      background: var(--rose-pale);
+      border: 1px solid var(--rose-doux);
+      color: var(--rose-fonce);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* ─── SECTIONS COMMUNES ──────────────────────────────────────── */
+    section { padding: 80px 6%; }
+    .section-titre { text-align: center; margin-bottom: 3rem; }
+    .section-titre h2 {
+      font-family: var(--font-titre);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      color: var(--texte);
+      margin-bottom: 0.5rem;
+    }
+    .section-titre p {
+      font-size: 0.82rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mauve);
+    }
+    .trait {
+      width: 50px; height: 2px;
+      background: linear-gradient(90deg, var(--rose-vif), var(--mauve));
+      margin: 0.8rem auto 0;
+      border-radius: 2px;
+    }
+
+    /* ─── TARIFS ─────────────────────────────────────────────────── */
+    #tarifs { background: var(--rose-pale); }
+    .grille-tarifs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .carte-tarif {
+      background: var(--blanc);
+      border: 1px solid var(--rose-doux);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: relative;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .carte-tarif:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 35px rgba(224,122,153,0.18);
+    }
+    .carte-tarif.vedette {
+      border-color: var(--rose-vif);
+      box-shadow: 0 4px 20px rgba(224,122,153,0.2);
+    }
+    .carte-tarif.vedette::before {
+      content: '✦ Populaire';
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      background: var(--rose-vif); color: #fff;
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 12px;
+    }
+    .tarif-icone { font-size: 1.8rem; margin-bottom: 10px; }
+    .tarif-nom {
+      font-family: var(--font-titre);
+      font-size: 1.3rem; font-weight: 600;
+      color: var(--texte); margin-bottom: 4px;
+    }
+    .tarif-desc { font-size: 0.8rem; color: var(--texte-doux); margin-bottom: 16px; }
+    .tarif-prix {
+      font-family: var(--font-titre);
+      font-size: 2rem; font-weight: 600;
+      color: var(--rose-fonce);
+    }
+    .tarif-prix span { font-size: 0.9rem; font-weight: 300; color: var(--texte-doux); }
+    .tarif-liste {
+      list-style: none; margin-top: 14px;
+      border-top: 1px solid var(--rose-pale); padding-top: 14px;
+    }
+    .tarif-liste li { font-size: 0.8rem; color: var(--texte-doux); padding: 4px 0; }
+    .tarif-liste li::before { content: '♡ '; color: var(--rose-vif); }
+
+    /* ─── DURÉE ──────────────────────────────────────────────────── */
+    #duree { background: var(--blanc); }
+    .grille-duree {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      max-width: 900px; margin: 0 auto;
+    }
+    .carte-duree {
+      background: var(--mauve-clair);
+      border: 1px solid var(--mauve);
+      border-radius: 18px;
+      padding: 24px 20px;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .carte-duree:hover { transform: translateY(-4px); }
+    .duree-icone { font-size: 1.6rem; margin-bottom: 10px; }
+    .duree-service {
+      font-family: var(--font-titre);
+      font-size: 1.1rem; font-weight: 600; color: var(--texte);
+      margin-bottom: 8px;
+    }
+    .duree-temps {
+      font-size: 1.5rem; font-weight: 500;
+      color: var(--mauve); font-family: var(--font-titre);
+    }
+    .duree-note { font-size: 0.72rem; color: var(--texte-doux); margin-top: 4px; }
+
+    /* ─── GALERIE MASONRY (Pinterest) ───────────────────────────── */
+    #galerie { background: var(--rose-pale); }
+
+    .masonry-grid {
+      columns: 4 180px;
+      column-gap: 12px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    @media (max-width: 700px) { .masonry-grid { columns: 2 140px; } }
+    @media (max-width: 420px) { .masonry-grid { columns: 2 120px; } }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, transform 0.3s;
+      display: block;
+    }
+    .masonry-item:hover { border-color: var(--rose-vif); transform: scale(1.02); }
+    .masonry-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      transition: transform 0.4s ease;
+    }
+    .masonry-item:hover img { transform: scale(1.05); }
+
+    .masonry-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(196,90,122,0.65), transparent 55%);
+      opacity: 0; transition: opacity 0.3s;
+      border-radius: 12px;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 12px;
+    }
+    .masonry-item:hover .masonry-overlay { opacity: 1; }
+    .masonry-overlay span {
+      color: #fff; font-size: 0.72rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+
+    .zoom-icon {
+      position: absolute; top: 9px; right: 9px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s;
+      font-size: 14px;
+    }
+    .masonry-item:hover .zoom-icon { opacity: 1; }
+
+    .emoji-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      background: var(--mauve-clair);
+      min-height: 160px;
+      border-radius: 12px;
+    }
+
+    /* ─── LIGHTBOX ───────────────────────────────────────────────── */
+    .lightbox {
+      position: fixed; inset: 0;
+      background: rgba(74,32,53,0.9);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-wrap { position: relative; max-width: 90vw; max-height: 88vh; }
+    .lightbox-wrap img {
+      max-width: 90vw; max-height: 82vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      object-fit: contain;
+      display: block;
+    }
+    .lightbox-close {
+      position: absolute; top: -14px; right: -14px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--rose-fonce); color: #fff;
+      border: none; cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lightbox-close:hover { background: #a03a60; }
+    .lightbox-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
+      width: 42px; height: 42px; cursor: pointer; color: #fff;
+      font-size: 20px; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.35); }
+    .lightbox-prev { left: -58px; }
+    .lightbox-next { right: -58px; }
+    .lightbox-label {
+      text-align: center; color: rgba(255,255,255,0.75);
+      font-size: 0.78rem; letter-spacing: 0.15em;
+      text-transform: uppercase; margin-top: 10px;
+    }
+
+    /* ─── LANGUES & INFOS ────────────────────────────────────────── */
+    #infos { background: var(--blanc); }
+    .grille-infos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .carte-info {
+      background: var(--blanc);
+      border: 1px solid var(--rose-doux);
+      border-radius: 20px;
+      padding: 28px 24px;
+      transition: box-shadow 0.3s;
+    }
+    .carte-info:hover { box-shadow: 0 8px 28px rgba(224,122,153,0.15); }
+    .info-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .info-icone {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--rose-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .info-titre {
+      font-family: var(--font-titre);
+      font-size: 1.15rem; font-weight: 600;
+      color: var(--texte);
+    }
+    .langue-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .langue-tag {
+      background: var(--rose-pale);
+      border: 1px solid var(--rose-doux);
+      color: var(--rose-fonce);
+      font-size: 0.78rem; padding: 5px 14px;
+      border-radius: 20px;
+    }
+    .horaires { font-size: 0.85rem; color: var(--texte-doux); }
+    .horaires .jour {
+      display: flex; justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--rose-pale);
+    }
+    .horaires .jour:last-child { border-bottom: none; }
+    .horaires .heure { font-weight: 500; color: var(--rose-fonce); }
+    .ferme { color: #ccc !important; }
+    .reseaux { display: flex; flex-direction: column; gap: 10px; }
+    .reseau-lien {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+      color: var(--texte-doux);
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: var(--rose-pale);
+      border: 1px solid var(--rose-doux);
+      transition: background 0.3s, color 0.3s;
+    }
+    .reseau-lien:hover { background: var(--rose-vif); color: #fff; }
+    .reseau-lien span { font-size: 1.1rem; }
+    .localisation { font-size: 0.85rem; color: var(--texte-doux); line-height: 1.9; }
+    .localisation a {
+      display: inline-block; margin-top: 12px;
+      color: var(--rose-fonce); text-decoration: none;
+      font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .localisation a:hover { text-decoration: underline; }
+
+    /* ─── CONSEILS ENTRETIEN ─────────────────────────────────────── */
+    #conseils { background: var(--mauve-clair); }
+    .grille-conseils {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .conseil-card {
+      background: var(--blanc);
+      border-radius: 18px;
+      padding: 24px 20px;
+      border: 1px solid var(--mauve);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .conseil-card:hover { transform: translateY(-4px); }
+    .conseil-icone { font-size: 2rem; margin-bottom: 12px; }
+    .conseil-titre {
+      font-family: var(--font-titre);
+      font-size: 1.05rem; font-weight: 600;
+      color: var(--texte); margin-bottom: 8px;
+    }
+    .conseil-texte { font-size: 0.8rem; color: var(--texte-doux); line-height: 1.7; }
+
+    /* ─── RDV / CTA ──────────────────────────────────────────────── */
+    #rdv {
+      background: linear-gradient(135deg, var(--rose-fonce) 0%, #a03a60 100%);
+      color: #fff;
+      text-align: center;
+      padding: 80px 6%;
+    }
+    #rdv h2 {
+      font-family: var(--font-titre);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+    #rdv p { font-size: 0.9rem; opacity: 0.85; max-width: 460px; margin: 0 auto 2rem; }
+    .btn-blanc {
+      display: inline-block;
+      background: #fff;
+      color: var(--rose-fonce);
+      text-decoration: none;
+      padding: 14px 38px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .btn-blanc:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.2); }
+    .rdv-contact { margin-top: 2rem; font-size: 0.82rem; opacity: 0.8; }
+    .rdv-contact a { color: var(--rose-doux); text-decoration: none; }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--texte);
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 28px 6%;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+    }
+    footer strong { color: var(--rose-doux); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      nav { justify-content: center; }
+      .nav-logo { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pétales animés -->
+  <div id="petales"></div>
+
+  <!-- ── NAVIGATION ── -->
+  <nav>
+    <div class="nav-logo">NailMi</div>
+    <ul class="nav-links">
+      <li><a href="#tarifs">Tarifs</a></li>
+      <li><a href="#duree">Durée</a></li>
+      <li><a href="#galerie">Designs</a></li>
+      <li><a href="#infos">Infos</a></li>
+      <li><a href="#conseils">Conseils</a></li>
+      <li><a href="#rdv" class="nav-cta">Réserver</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div>
+      <img src="images/logo.jpg" alt="Logo NailMi" class="hero-logo">
+      <p class="hero-sous">✦ Nail Artist ✦</p>
+      <h1 class="hero-titre">Nail<span>Mi</span></h1>
+      <p class="hero-desc">Des ongles qui vous ressemblent — poses gel, nail art, et soins personnalisés dans une ambiance douce et chaleureuse.</p>
+      <a href="#rdv" class="btn-principal">Prendre rendez-vous</a>
+      <div class="hero-badges">
+        <span class="badge">✓ Produits professionnels</span>
+        <span class="badge">✓ Gel &amp; Acrylique</span>
+        <span class="badge">✓ Nail Art sur mesure</span>
+        <span class="badge">✓ Hygiène irréprochable</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TARIFS ── -->
+  <section id="tarifs">
+    <div class="section-titre">
+      <p>Ce que je propose</p>
+      <h2>Mes Tarifs</h2>
+      <div class="trait"></div>
+    </div>
+    <div class="grille-tarifs">
+
+      <div class="carte-tarif">
+        <div class="tarif-icone">💘💋</div>
+        <div class="tarif-nom">Manucure simple</div>
+        <div class="tarif-desc">Lime, cuticules &amp; vernis classique</div>
+        <div class="tarif-prix">10 € <span>/ séance</span></div>
+        <ul class="tarif-liste">
+          <li>Lime &amp; mise en forme</li>
+          <li>Soin des cuticules</li>
+          <li>Vernis couleur au choix</li>
+          <li>Mise en forme naturelle</li>
+        </ul>
+      </div>
+
+      <div class="carte-tarif vedette">
+        <div class="tarif-icone">💋💐</div>
+        <div class="tarif-nom">Renforcement &amp; Gel</div>
+        <div class="tarif-desc">Gel UV longue durée, ultra résistant</div>
+        <div class="tarif-prix">30 € <span>/ séance</span></div>
+        <ul class="tarif-liste">
+          <li>Préparation &amp; dégraissage</li>
+          <li>Pose gel 3 couches UV + renforcement avec base si nécessaire</li>
+          <li>Finition brillante ou mate</li>
+          <li>Design léger inclus (French/baby boomer/détails minimalistes)</li>
+        </ul>
+      </div>
+
+      <div class="carte-tarif">
+        <div class="tarif-icone">💄💍👗👠💋</div>
+        <div class="tarif-nom">Remplissage gel / Correction</div>
+        <div class="tarif-desc">Entretien toutes les 3 semaines</div>
+        <div class="tarif-prix">15 € <span>/ séance</span></div>
+        <ul class="tarif-liste">
+          <li>Remplissage de la racine</li>
+          <li>Correction de forme</li>
+          <li>Nouvelle couleur possible</li>
+          <li>Nouvelle forme si souhaitée</li>
+        </ul>
+      </div>
+
+      <div class="carte-tarif">
+        <div class="tarif-icone">👰‍♀️💋❤️🤵‍♂️</div>
+        <div class="tarif-nom">Nail Art</div>
+        <div class="tarif-desc">Designs uniques &amp; personnalisés</div>
+        <div class="tarif-prix">1 € <span>/ par ongle</span></div>
+        <ul class="tarif-liste">
+          <li>Design détaillé et créatif</li>
+          <li>Paillettes &amp; chromes</li>
+          <li>Strass &amp; pierres</li>
+          <li>Dentelles / Cateye</li>
+          <li>Design à communiquer en avance</li>
+        </ul>
+      </div>
+
+      <div class="carte-tarif">
+        <div class="tarif-icone">💋🕺🏻🤰🏼</div>
+        <div class="tarif-nom">Ongles naturels</div>
+        <div class="tarif-desc">Manicure sur ongles naturels</div>
+        <div class="tarif-prix">20 € <span>/ séance</span></div>
+        <ul class="tarif-liste">
+          <li>Préparation de l'ongle</li>
+          <li>Correction de forme</li>
+          <li>Renforcement léger si besoin</li>
+          <li>Finition propre (sans extension)</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── DURÉE ── -->
+  <section id="duree">
+    <div class="section-titre">
+      <p>Organisation de votre visite</p>
+      <h2>Durée des Prestations</h2>
+      <div class="trait"></div>
+    </div>
+    <div class="grille-duree">
+
+      <div class="carte-duree">
+        <div class="duree-icone">💅</div>
+        <div class="duree-service">Manucure simple</div>
+        <div class="duree-temps">30 min</div>
+        <div class="duree-note">Idéal pour un entretien rapide</div>
+      </div>
+
+      <div class="carte-duree">
+        <div class="duree-icone">✨</div>
+        <div class="duree-service">Pose gel / extension</div>
+        <div class="duree-temps">2h</div>
+        <div class="duree-note">Première pose ou changement complet</div>
+      </div>
+
+      <div class="carte-duree">
+        <div class="duree-icone">🌸</div>
+        <div class="duree-service">Remplissage</div>
+        <div class="duree-temps">1h</div>
+        <div class="duree-note">Entretien 3 semaines après la pose</div>
+      </div>
+
+      <div class="carte-duree">
+        <div class="duree-icone">💎</div>
+        <div class="duree-service">Nail Art élaboré</div>
+        <div class="duree-temps">+/- 45 min</div>
+        <div class="duree-note">En supplément selon le design</div>
+      </div>
+
+      <div class="carte-duree">
+        <div class="duree-icone">🌿</div>
+        <div class="duree-service">Dépose</div>
+        <div class="duree-temps">30 min</div>
+        <div class="duree-note">Peut être combinée à une nouvelle pose</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── GALERIE DESIGNS ── -->
+  <section id="galerie">
+    <div class="section-titre">
+      <p>Inspirations &amp; créations</p>
+      <h2>Exemples de Designs</h2>
+      <div class="trait"></div>
+    </div>
+
+    <div class="masonry-grid" id="masonry">
+
+      <div class="masonry-item" data-nom="Pink Vibes" data-index="0">
+        <img src="images/pink-vibes.jpg" alt="Pink Vibes">
+        <div class="masonry-overlay"><span>Pink Vibes</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Pink French" data-index="1">
+        <img src="images/pink-french.jpg" alt="Pink French">
+        <div class="masonry-overlay"><span>Pink French</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Cateye Gold" data-index="2">
+        <img src="images/cateye-gold.png" alt="Cateye Gold">
+        <div class="masonry-overlay"><span>Cateye Gold</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Perles" data-index="3">
+        <img src="images/perles.jpg" alt="Perles">
+        <div class="masonry-overlay"><span>Perles</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Guess" data-index="4">
+        <img src="images/guess.jpg" alt="Guess">
+        <div class="masonry-overlay"><span>Guess</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Dentelle" data-index="5">
+        <img src="images/dentelle.png" alt="Dentelle">
+        <div class="masonry-overlay"><span>Dentelle</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Cateye Rouge" data-index="6">
+        <img src="images/cateye-rouge.png" alt="Cateye Rouge">
+        <div class="masonry-overlay"><span>Cateye Rouge</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+
+      <div class="masonry-item" data-nom="Cateye Rouge" data-index="6">
+        <img src="images/bubblegum.jpg" alt="Cateye Rouge">
+        <div class="masonry-overlay"><span>Cateye Rouge</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+       <div class="masonry-item" data-nom="Cateye Rouge" data-index="6">
+        <img src="images/silver.jpg" alt="Cateye Rouge">
+        <div class="masonry-overlay"><span>Silver</span></div>
+        <div class="zoom-icon">🔍</div>
+      </div>
+    </div>
+
+    <p style="text-align:center; margin-top: 2rem; font-size:0.82rem; color: var(--texte-doux);">
+      ✦ Retrouvez toutes mes créations sur Instagram <strong>@nailmi</strong>
+    </p>
+  </section>
+
+  <!-- ── LIGHTBOX ── -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-wrap">
+      <button class="lightbox-nav lightbox-prev" id="lb-prev">&#8592;</button>
+      <button class="lightbox-nav lightbox-next" id="lb-next">&#8594;</button>
+      <button class="lightbox-close" id="lb-close">✕</button>
+      <img id="lb-img" src="" alt="">
+      <p class="lightbox-label" id="lb-label"></p>
+    </div>
+  </div>
+
+  <!-- ── INFOS PRATIQUES ── -->
+  <section id="infos">
+    <div class="section-titre">
+      <p>Pour vous accueillir au mieux</p>
+      <h2>Informations Pratiques</h2>
+      <div class="trait"></div>
+    </div>
+    <div class="grille-infos">
+
+      <div class="carte-info">
+        <div class="info-header">
+          <div class="info-icone">🗣️</div>
+          <div class="info-titre">Langues parlées</div>
+        </div>
+        <div class="langue-tags">
+          <span class="langue-tag">Français</span>
+          <span class="langue-tag">Russe</span>
+          <span class="langue-tag">Anglais</span>
+          <span class="langue-tag">Arménien</span>
+        </div>
+      </div>
+
+      <div class="carte-info">
+        <div class="info-header">
+          <div class="info-icone">🕐</div>
+          <div class="info-titre">Horaires</div>
+        </div>
+        <div class="horaires">
+          <div class="jour"><span>Lundi</span><span class="heure ferme">Fermé</span></div>
+          <div class="jour"><span>Mardi – Vendredi</span><span class="heure">9h – 19h</span></div>
+          <div class="jour"><span>Samedi</span><span class="heure">9h – 18h</span></div>
+          <div class="jour"><span>Dimanche</span><span class="heure ferme">Fermé</span></div>
+        </div>
+      </div>
+
+      <div class="carte-info">
+        <div class="info-header">
+          <div class="info-icone">📱</div>
+          <div class="info-titre">Me retrouver</div>
+        </div>
+        <div class="reseaux">
+          <a href="#" class="reseau-lien"><span>📸</span> Instagram – @nailmi</a>
+          <a href="#" class="reseau-lien"><span>📘</span> Facebook – NailMi</a>
+          <a href="#" class="reseau-lien"><span>🎵</span> TikTok – @nailmi</a>
+          <a href="tel:+33600000000" class="reseau-lien"><span>📞</span> +33 6 00 00 00 00</a>
+        </div>
+      </div>
+
+      <div class="carte-info">
+        <div class="info-header">
+          <div class="info-icone">📍</div>
+          <div class="info-titre">Localisation</div>
+        </div>
+        <div class="localisation">
+          <strong>NailMi – Nail Artist</strong><br>
+          12 rue des Roses<br>
+          59700 Marcq-en-Barœul<br>
+          France<br>
+          <a href="https://maps.google.com/" target="_blank">→ Voir sur Google Maps</a>
+        </div>
+      </div>
+
+      <div class="carte-info">
+        <div class="info-header">
+          <div class="info-icone">💳</div>
+          <div class="info-titre">Moyens de paiement</div>
+        </div>
+        <div class="langue-tags">
+          <span class="langue-tag">💵 Espèces</span>
+          <span class="langue-tag">💳 Carte bancaire</span>
+          <span class="langue-tag">📲 PayPal</span>
+          <span class="langue-tag">📱 Virement</span>
+        </div>
+      </div>
+
+      <div class="carte-info">
+        <div class="info-header">
+          <div class="info-icone">🧼</div>
+          <div class="info-titre">Hygiène &amp; sécurité</div>
+        </div>
+        <div class="localisation">
+          Matériel stérilisé entre chaque client.<br>
+          Produits certifiés sans substances nocives.<br>
+          Limes et embouts à usage unique.<br>
+          Ongles naturels respectés et préservés.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── CONSEILS ENTRETIEN ── -->
+  <section id="conseils">
+    <div class="section-titre">
+      <p>Pour garder de beaux ongles</p>
+      <h2>Conseils d'Entretien</h2>
+      <div class="trait"></div>
+    </div>
+    <div class="grille-conseils">
+
+      <div class="conseil-card">
+        <div class="conseil-icone">🧴</div>
+        <div class="conseil-titre">Hydratez vos cuticules</div>
+        <div class="conseil-texte">Appliquez une huile pour cuticules chaque soir pour maintenir une peau souple autour des ongles.</div>
+      </div>
+
+      <div class="conseil-card">
+        <div class="conseil-icone">🧤</div>
+        <div class="conseil-titre">Protégez vos mains</div>
+        <div class="conseil-texte">Portez des gants pour les tâches ménagères et le jardinage pour prolonger la durée de votre pose.</div>
+      </div>
+
+      <div class="conseil-card">
+        <div class="conseil-icone">⏰</div>
+        <div class="conseil-titre">Venez toutes les 3 semaines</div>
+        <div class="conseil-texte">Pour un remplissage gel, revenez 3 semaines après la pose — ni trop tôt, ni trop tard.</div>
+      </div>
+
+      <div class="conseil-card">
+        <div class="conseil-icone">🚿</div>
+        <div class="conseil-titre">Évitez l'eau prolongée</div>
+        <div class="conseil-texte">Les bains longs et les piscines peuvent fragiliser l'adhérence du gel. Séchez bien vos mains.</div>
+      </div>
+
+      <div class="conseil-card">
+        <div class="conseil-icone">✂️</div>
+        <div class="conseil-titre">Ne forcez jamais</div>
+        <div class="conseil-texte">Évitez d'utiliser vos ongles comme outil. En cas de cassure, contactez-moi pour une réparation rapide.</div>
+      </div>
+
+      <div class="conseil-card">
+        <div class="conseil-icone">💊</div>
+        <div class="conseil-titre">Vitamines &amp; nutrition</div>
+        <div class="conseil-texte">La biotine (vitamine B8) et une alimentation riche en protéines favorisent des ongles naturels plus solides.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── RDV / CTA ── -->
+  <section id="rdv">
+    <h2>Prête pour de beaux ongles ? ✨</h2>
+    <p>Réservez votre séance en ligne ou contactez-moi directement — je serai ravie de vous accueillir.</p>
+    <a href="tel:+33600000000" class="btn-blanc">Réserver maintenant</a>
+    <div class="rdv-contact">
+      ou envoyez-moi un message sur <a href="#">Instagram</a> · <a href="#">WhatsApp</a>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <strong>NailMi</strong> – Nail Artist &nbsp;|&nbsp; Fait avec ♡ &nbsp;|&nbsp; Tous droits réservés © 2026
+  </footer>
+
+  <!-- ── SCRIPTS ── -->
+  <script>
+    /* --- Pétales --- */
+    const colors = ['#f4b8cc','#e07a99','#c9a0bc','#fce8ee','#f0e0f0'];
+    const container = document.getElementById('petales');
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement('div');
+      p.classList.add('petal');
+      const size = 8 + Math.random() * 10;
+      p.style.cssText = `
+        left: ${Math.random()*100}vw;
+        width: ${size}px; height: ${size*1.4}px;
+        background: ${colors[Math.floor(Math.random()*colors.length)]};
+        animation-duration: ${8+Math.random()*8}s;
+        animation-delay: -${Math.random()*12}s;
+      `;
+      container.appendChild(p);
+    }
+
+    /* --- Lightbox --- */
+    const items   = document.querySelectorAll('.masonry-item');
+    const lb      = document.getElementById('lightbox');
+    const lbImg   = document.getElementById('lb-img');
+    const lbLabel = document.getElementById('lb-label');
+    let current   = 0;
+
+    const photos = Array.from(items).map(item => {
+      const img = item.querySelector('img');
+      return { src: img ? img.src : '', nom: item.dataset.nom || '' };
+    });
+
+    function openLb(i) {
+      if (!photos[i].src) return;
+      current = i;
+      lbImg.src = photos[i].src;
+      lbLabel.textContent = photos[i].nom;
+      lb.classList.add('open');
+    }
+    function closeLb() { lb.classList.remove('open'); }
+
+    items.forEach((item, i) => item.addEventListener('click', () => openLb(i)));
+    document.getElementById('lb-close').addEventListener('click', closeLb);
+    document.getElementById('lb-prev').addEventListener('click', e => {
+      e.stopPropagation();
+      openLb((current - 1 + photos.length) % photos.length);
+    });
+    document.getElementById('lb-next').addEventListener('click', e => {
+      e.stopPropagation();
+      openLb((current + 1) % photos.length);
+    });
+    lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape')      closeLb();
+      if (e.key === 'ArrowLeft')   openLb((current-1+photos.length)%photos.length);
+      if (e.key === 'ArrowRight')  openLb((current+1)%photos.length);
+    });
+  </script>
+
+</body></html>
